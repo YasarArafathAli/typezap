@@ -2,19 +2,18 @@ import {useState, useEffect} from 'react';
 import './App.css';
 import LetterBox from './components/LetterBox';
 var milli = 0;
-var sec = 0;
+
 var Interval;
 // import UserInput from './components/UserInput';
 
 function App() {
   const [pattern,setPattern] = useState([])
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [value, setValue] = useState('');
   const [timer,setTimer] = useState({sec:0,milli:0});
   const [highScore, setHighScore] = useState(0);
   const [result, setResult] = useState('')
-
-
+  // init
   useEffect(() => {
     handleReset();
     setResult("")
@@ -22,6 +21,20 @@ function App() {
     //eslint-disable-next-line
   }, []);
 
+  // reset handler
+  const handleReset = () =>  {
+    setPattern(makeRandom(20).split(' '));
+    setTimer({sec:0,milli:0});
+    stopTimer()
+  }
+
+   // get highscore from local storage
+   function getHighScore(){
+    var hs = localStorage.getItem('highScore');
+    if (hs) setHighScore(hs);
+    else setHighScore(0)
+
+  }
   //generate alphabet pattern
   function makeRandom(length) {
     var result           = '';
@@ -56,7 +69,6 @@ function App() {
     });
     }
     if(milli > 99){
-      sec++;
       milli = 0;
       setTimer(previousState => {
         return {sec:previousState.sec++, milli:0}
@@ -64,28 +76,12 @@ function App() {
     }
   }
 
-
-
  
-  function getHighScore(){
-    var hs = localStorage.getItem('highScore');
-    if (hs) setHighScore(hs);
-    else setHighScore(0)
-
-  }
-  const handleReset = () =>  {
-    setPattern(makeRandom(20).split(' '));
-    setTimer({sec:0,milli:0});
-    stopTimer()
-  }
-
-
-
-
-  
-
+// game logic - processing user input
   const processInput = () => {
     var input = value; 
+    if(input=== ""){setValue('')}
+    else{
     console.log(input);
     var currentActiveIndex = activeIndex;
     var currentInput = input.charAt(input.length-1)
@@ -112,15 +108,20 @@ function App() {
         return {sec:previousState.sec, milli:previousState.milli+50}
       });
     }
-    
+  }
 
   }
 
-  // handle backspace
+  // handling backspace
   function handleKeyUp(e) {
+    if(value=== '') setActiveIndex(0);
     if(e.key === 'Backspace'){
       setActiveIndex(index => index-2)
-  }}
+  }
+  if(e.key === 'Enter'){
+    console.log(e)
+  }
+}
 
   return (
     <div className="App">
@@ -133,9 +134,7 @@ function App() {
     <div>
     <div>
     {/* <p>{value}</p> */}
-    <input type="text" value={value} onFocus={() => {
-      setActiveIndex(0);
-      startTimer();}} onBlur={stopTimer} onKeyUp={handleKeyUp} onKeyDown= {processInput} onChange={e => setValue(e.target.value.toUpperCase())}/>
+    <input type="text" value={value} onFocus={startTimer} onBlur={stopTimer} onKeyUp={handleKeyUp} onChange={e => setValue(e.target.value.toUpperCase())}/>
     <button onClick={handleReset}>Reset</button>
     </div>
     </div>
