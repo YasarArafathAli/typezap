@@ -119,7 +119,8 @@ function App() {
       setActiveIndex(index => index-2)
   }
   if(e.key === 'Enter'){
-    console.log(e)
+    console.log(e);
+    startTimer();
   }
 }
 
@@ -133,8 +134,8 @@ function App() {
     <div><h4>High score: {highScore}</h4></div>
     <div>
     <div>
-    {/* <p>{value}</p> */}
-    <input type="text" value={value} onFocus={startTimer} onBlur={stopTimer} onKeyUp={handleKeyUp} onChange={e => setValue(e.target.value.toUpperCase())}/>
+    <p>Hit enter to start :)</p>
+    <input type="text" value={value}  onBlur={stopTimer} onKeyUp={handleKeyUp} onKeyDown= {processInput} onChange={e => setValue(e.target.value.toUpperCase())}/>
     <button onClick={handleReset}>Reset</button>
     </div>
     </div>
